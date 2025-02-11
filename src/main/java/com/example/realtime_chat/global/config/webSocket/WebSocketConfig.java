@@ -1,4 +1,4 @@
-package com.example.realtime_chat.global.config.WebSocket;
+package com.example.realtime_chat.global.config.webSocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

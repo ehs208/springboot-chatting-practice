@@ -1,4 +1,4 @@
-package com.example.realtime_chat.global.config.WebSocket;
+package com.example.realtime_chat.global.config.webSocket;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -8,6 +8,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.example.realtime_chat.domain.chatMessage.domain.ChatMessage;
 import com.example.realtime_chat.domain.chatMessage.domain.repository.ChatMessageRepository;
+import com.example.realtime_chat.global.config.webSocket.dto.ChatMessageDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WebSocketHandler extends TextWebSocketHandler {
 	private final WebSocketService webSocketService;
 	private final ChatMessageRepository chatMessageRepository;
+	private final ObjectMapper objectMapper;
 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -34,7 +37,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 		WebSocketUser user = webSocketService.getUser(sessionId);
 
 		if (user != null) {
-			webSocketService.broadcastMessage(sessionId, user.nickname + "님이 퇴장하셨습니다.");
+			webSocketService.broadcastMessage(sessionId, user.getNickname() + "님이 퇴장하셨습니다.");
 		}
 
 		webSocketService.removeUser(sessionId);
@@ -47,8 +50,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
 		WebSocketUser user = webSocketService.getUser(sessionId);
 		String payload = message.getPayload();
 
-		chatMessageRepository.save(ChatMessage.createChatMessage(user.nickname, payload));
-		webSocketService.broadcastMessage(sessionId, user.nickname + ": " + payload);
+		ChatMessage chatMessage = ChatMessage.createChatMessage(user.getNickname(), payload);
+		chatMessageRepository.save(chatMessage);
+
+		ChatMessageDto chatMessageDto = ChatMessageDto.createChatMessageDto(chatMessage.getSender(),
+			chatMessage.getContent(), chatMessage.getTimestamp());
+
+		String jsonMessage = objectMapper.writeValueAsString(chatMessageDto);
+		webSocketService.broadcastMessage(sessionId, jsonMessage);
 	}
 
 	private String getNicknameFromSession(WebSocketSession session) {

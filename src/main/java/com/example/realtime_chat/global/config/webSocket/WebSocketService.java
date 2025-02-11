@@ -1,4 +1,4 @@
-package com.example.realtime_chat.global.config.WebSocket;
+package com.example.realtime_chat.global.config.webSocket;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +18,7 @@ public class WebSocketService {
 
 	public boolean isDuplicateNickname(String nickname) {
 		return CLIENTS.values().stream()
-			.anyMatch(user -> user.nickname.equals(nickname));
+			.anyMatch(user -> user.getNickname().equals(nickname));
 	}
 
 	public void addUser(WebSocketSession session, String nickname) {
@@ -34,12 +34,12 @@ public class WebSocketService {
 		return CLIENTS.get(sessionId);
 	}
 
-	public void broadcastMessage(String senderId, String message) throws IOException {
-		TextMessage textMessage = new TextMessage(message);
+	public void broadcastMessage(String senderId, String jsonMessage) throws IOException {
+		TextMessage textMessage = new TextMessage(jsonMessage);
 		CLIENTS.entrySet().forEach(arg -> {
 			if (!arg.getKey().equals(senderId)) {
 				try {
-					arg.getValue().session.sendMessage(textMessage);
+					arg.getValue().getSession().sendMessage(textMessage);
 				} catch (IOException e) {
 					log.error("Error sending message", e);
 				}

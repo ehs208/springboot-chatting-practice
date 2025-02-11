@@ -1,7 +1,8 @@
-package com.example.realtime_chat.global.config.WebSocket;
+package com.example.realtime_chat.global.config.webSocket;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 		String nickname = extractNickname(request.getURI().getQuery());
 
 		if (webSocketService.isDuplicateNickname(nickname)) {
+			response.setStatusCode(HttpStatus.FORBIDDEN);
 			return false;
 		}
 
