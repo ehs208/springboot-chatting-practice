@@ -1,18 +1,25 @@
 package com.example.realtime_chat.domain.chatMessage.domain;
 
-import com.example.realtime_chat.domain.BaseTimeEntity;
+import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ChatMessage extends BaseTimeEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class ChatMessage {
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -20,6 +27,10 @@ public class ChatMessage extends BaseTimeEntity {
 	private String sender;
 
 	private String content;
+
+	@CreatedDate
+	@Column(updatable = false)
+	private LocalDateTime timestamp;
 
 	@Builder
 	private ChatMessage(String sender, String content) {
