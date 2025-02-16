@@ -24,6 +24,8 @@ public class ChatMessage {
 	@GeneratedValue
 	private Long id;
 
+	private Long roomId;
+
 	private String sender;
 
 	private String content;
@@ -33,13 +35,15 @@ public class ChatMessage {
 	private LocalDateTime timestamp;
 
 	@Builder
-	private ChatMessage(String sender, String content) {
+	private ChatMessage(String sender, String content, Long roomId) {
 		this.sender = sender;
 		this.content = content;
+		this.roomId = roomId;
 	}
 
-	public static ChatMessage createChatMessage(String sender, String content) {
+	public static ChatMessage createChatMessage(String sender, String content, Long roomId) {
 		return ChatMessage.builder()
+			.roomId(roomId)
 			.sender(sender)
 			.content(content)
 			.build();
